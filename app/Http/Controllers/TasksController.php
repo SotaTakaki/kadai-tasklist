@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Task;
+use App\User;
 
 class TasksController extends Controller
 {
@@ -14,9 +15,17 @@ class TasksController extends Controller
      */
     public function index()
     {
-        $tasks = Task::all();
-        
-        return view("tasks.index", ["tasks" => $tasks, ]);
+        $data = [];
+        if (\Auth::check()) {
+            $user = \Auth::user();
+            $tasks = $user->tasks()->orderBy('created_at', 'desc')->paginate(10);
+            
+            $data = [
+                "user" => $user,
+                "tasks" => $tasks,
+            ];
+        }
+        return view("welcome", $data);
     }
 
     /**
@@ -44,10 +53,17 @@ class TasksController extends Controller
             "content" => "required",
         ]);
         
-        $task = new Task;
+   /*     $task = new Task;
+        $task->user_id = $request->user_id;
         $task->status = $request->status;
         $task->content = $request->content;
         $task->save();
+    */
+    
+        $request->user()->tasks()->create([
+            'content' => $request->content,
+            'status' => $request->status,
+        ]);
         
         return redirect("/");
     }
@@ -61,8 +77,13 @@ class TasksController extends Controller
     public function show($id)
     {
         $task = Task::findOrFail($id);
+    //    $user->loadRelationshipCounts();
+    //    $tasks = $user->tasks()->orderBy('created_at', 'desc')->paginate(10);
         
-        return view("tasks.show", ["task" => $task, ]);
+        
+        return view("tasks.show", [
+            "task" => $task, 
+            ]);
     }
 
     /**
@@ -94,6 +115,7 @@ class TasksController extends Controller
             
         $task = Task::findOrFail($id);
         
+        //$task->user_id = $request->user_id;
         $task->status = $request->status;
         $task->content = $request->content;
         $task->save();
@@ -111,7 +133,9 @@ class TasksController extends Controller
     {
         $task = Task::findOrFail($id);
         
-        $task->delete();
+        if (\Auth::id() === $task->user_id) {
+            $task->delete();
+        }
         
         return redirect("/");
     }
