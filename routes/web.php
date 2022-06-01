@@ -14,8 +14,8 @@
 Route::get('/', 'TasksController@index');
 
 Route::group(['middleware' => ['auth']], function () {
-    Route::resource('tasks', 'TasksController');
- //   Route::resource('tasks', 'TasksController', ['only' => ['store', 'destroy']]);
+    //Route::resource('tasks', 'TasksController');
+    Route::resource('tasks', 'TasksController', ['only' => ['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']]);
 });
 
 

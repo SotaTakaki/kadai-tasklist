@@ -35,9 +35,9 @@ class TasksController extends Controller
      */
     public function create()
     {
-        $task = new Task;
+            $task = new Task;
         
-        return view("tasks.create", ["task" => $task, ] );
+            return view("tasks.create", ["task" => $task, ] );
     }
 
     /**
@@ -80,10 +80,14 @@ class TasksController extends Controller
     //    $user->loadRelationshipCounts();
     //    $tasks = $user->tasks()->orderBy('created_at', 'desc')->paginate(10);
         
-        
-        return view("tasks.show", [
-            "task" => $task, 
-            ]);
+        if (\Auth::id() === $task->user_id)
+        {
+            return view("tasks.show", [
+                "task" => $task, 
+                ]);
+        }
+        else
+            return redirect("/");
     }
 
     /**
@@ -95,8 +99,10 @@ class TasksController extends Controller
     public function edit($id)
     {
         $task = Task::findOrFail($id);
-        
-        return view("tasks.edit", ["task" => $task, ]);
+        if (\Auth::id() === $task->user_id)
+            return view("tasks.edit", ["task" => $task, ]);
+        else
+            return redirect("/");
     }
 
     /**
@@ -115,10 +121,13 @@ class TasksController extends Controller
             
         $task = Task::findOrFail($id);
         
-        //$task->user_id = $request->user_id;
-        $task->status = $request->status;
-        $task->content = $request->content;
-        $task->save();
+        if (\Auth::id() === $task->user_id)
+        {
+            //$task->user_id = $request->user_id;
+            $task->status = $request->status;
+            $task->content = $request->content;
+            $task->save();
+        }
         
         return redirect("/");
     }
