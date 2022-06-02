@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Task;
 use App\User;
 
+    
 class TasksController extends Controller
 {
     /**
@@ -13,6 +14,8 @@ class TasksController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    
+    // 異なるログインユーザーに対する対策
     public function index()
     {
         $data = [];
@@ -80,14 +83,13 @@ class TasksController extends Controller
     //    $user->loadRelationshipCounts();
     //    $tasks = $user->tasks()->orderBy('created_at', 'desc')->paginate(10);
         
-        if (\Auth::id() === $task->user_id)
-        {
+        if (\Auth::id() === $task->user_id) {
             return view("tasks.show", [
                 "task" => $task, 
                 ]);
-        }
-        else
+        } else {
             return redirect("/");
+        }
     }
 
     /**
@@ -99,10 +101,15 @@ class TasksController extends Controller
     public function edit($id)
     {
         $task = Task::findOrFail($id);
+        
         if (\Auth::id() === $task->user_id)
+        {
             return view("tasks.edit", ["task" => $task, ]);
+        }
         else
+        {
             return redirect("/");
+        }
     }
 
     /**

@@ -13,9 +13,10 @@
 
 Route::get('/', 'TasksController@index');
 
+// 未ログインに対する対策
 Route::group(['middleware' => ['auth']], function () {
-    //Route::resource('tasks', 'TasksController');
-    Route::resource('tasks', 'TasksController', ['only' => ['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']]);
+    Route::resource('tasks', 'TasksController');
+    
 });
 
 
